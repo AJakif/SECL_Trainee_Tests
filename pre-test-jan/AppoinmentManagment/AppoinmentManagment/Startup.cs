@@ -1,3 +1,6 @@
+using AppoinmentManagment.DataAccessLayer.IRepository;
+using AppoinmentManagment.DataAccessLayer.Repository;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -23,7 +26,17 @@ namespace AppoinmentManagment
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddTransient<IAuthenticationRepository, AuthenticationRepository>(); //
+            services.AddTransient<IUserRepository, UserRepository>();
             services.AddRazorPages();
+
+            services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Login";
+                    options.Cookie.Name = "Hospital";
+
+                });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -45,11 +58,39 @@ namespace AppoinmentManagment
 
             app.UseRouting();
 
+            app.UseAuthentication();
             app.UseAuthorization();
+
+
+            app.UseCookiePolicy();
 
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "/",
+                    defaults: new { controller = "Home", action = "Index", });
+
+                endpoints.MapControllerRoute(
+                    name: "register",
+                    pattern: "/Registration",
+                    defaults: new { controller = "Authentication", action = "Register", });
+                endpoints.MapControllerRoute(
+                    name: "login",
+                    pattern: "/Login",
+                    defaults: new { controller = "Authentication", action = "Login", });
+                endpoints.MapControllerRoute(
+                    name: "logout",
+                    pattern: "/Logout",
+                    defaults: new { controller = "Authentication", action = "Logout", });
+                endpoints.MapControllerRoute(
+                    name: "Patientdashboard",
+                    pattern: "/patient/dashboard",
+                    defaults: new { controller = "Patient", action = "Index", });
+                endpoints.MapControllerRoute(
+                    name: "Admindashboard",
+                    pattern: "/admin/dashboard",
+                    defaults: new { controller = "Admin", action = "Index", });
             });
         }
     }
