@@ -28,6 +28,8 @@ namespace AppoinmentManagment
         {
             services.AddTransient<IAuthenticationRepository, AuthenticationRepository>(); //
             services.AddTransient<IUserRepository, UserRepository>();
+            services.AddTransient<IAdminApiRepository, AdminApiRepository>();
+            services.AddTransient<ICompanyRepository, CompanyRepository>();
             services.AddRazorPages();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -91,6 +93,30 @@ namespace AppoinmentManagment
                     name: "Admindashboard",
                     pattern: "/admin/dashboard",
                     defaults: new { controller = "Admin", action = "Index", });
+                endpoints.MapControllerRoute(
+                    name: "GetAllPatient",
+                    pattern: "/admin/patient/all",
+                    defaults: new { controller = "Admin", action = "GetAllPatient", });
+                endpoints.MapControllerRoute(
+                    name: "GetAllDoctor",
+                    pattern: "/admin/doctor/all",
+                    defaults: new { controller = "Admin", action = "GetAllDoctor", });
+                endpoints.MapControllerRoute(
+                    name: "GetAllSpecialization",
+                    pattern: "/admin/specialization/all",
+                    defaults: new { controller = "Admin", action = "GetAllSpecialization", });
+                endpoints.MapControllerRoute(
+                    name: "AddDoctor",
+                    pattern: "/admin/doctor/add",
+                    defaults: new { controller = "Admin", action = "AddDoctor", });
+                endpoints.MapControllerRoute(
+                    name: "AddSpecialization",
+                    pattern: "/admin/speacialization/add",
+                    defaults: new { controller = "Admin", action = "AddSpecialization", });
+                endpoints.MapControllerRoute(
+                    name: "AddPatient",
+                    pattern: "/admin/patient/add",
+                    defaults: new { controller = "Admin", action = "AddPatient", });
             });
         }
     }

@@ -25,7 +25,7 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
         {
             string Query = "Insert into [User] ([TypeId] ,[Name] ,[Address] ,[Gender] ,[DOB] ,[Phone] ,[Email]"+
                 ",[Password],[Created_at],[Created_by])"+
-                $"values ('{2}','{um.Name}','{um.Address}','{um.Gender}','{um.DOB}','{um.Phone}','{um.Email}','{um.Password}',GETDATE(),'{um.Name}')";
+                $"values (2,'{um.Name}','{um.Address}','{um.Gender}','{um.DOB}','{um.Phone}','{um.Email}','{um.Password}',GETDATE(),'{um.Name}')";
             _logger.LogInformation("Entered in DMLTransaction..");
             int Result;
             string connectionString = _config["ConnectionStrings:DefaultConnection"];

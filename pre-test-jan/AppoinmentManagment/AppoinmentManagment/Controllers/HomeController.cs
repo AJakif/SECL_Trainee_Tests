@@ -1,4 +1,5 @@
-﻿using AppoinmentManagment.Models;
+﻿using AppoinmentManagment.DataAccessLayer.IRepository;
+using AppoinmentManagment.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -12,10 +13,12 @@ namespace AppoinmentManagment.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ICompanyRepository _comp;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ICompanyRepository comp)
         {
             _logger = logger;
+            _comp = comp;
         }
 
         public IActionResult Index()
@@ -29,5 +32,15 @@ namespace AppoinmentManagment.Controllers
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
+
+        #region API
+
+        [Route("/company/info")]
+        public JsonResult GetCompanyInfo()
+        {
+            CompanyModel cmp = _comp.GetInfo();
+            return Json(new {data = cmp});
+        }
+        #endregion
     }
 }
