@@ -114,6 +114,14 @@ namespace AppoinmentManagment.Controllers
                     {
                         return RedirectToRoute("Admindashboard");
                     }
+                    else if (user.Type == "Doctor")
+                    {
+                        return RedirectToRoute("Doctordashboard");
+                    }
+                    else if(user.Type == "Secretary")
+                    {
+                        return RedirectToRoute("Secretarydashboard");
+                    }
                 }
                 else
                 {

@@ -11,44 +11,46 @@ using System.Threading.Tasks;
 
 namespace AppoinmentManagment.Controllers
 {
+    [Authorize(Roles = "Admin")]
     public class AdminController : Controller
     {
         private readonly IAdminApiRepository _admin;
         private readonly IAuthenticationRepository _auth;
         private readonly ILogger<AdminController> _logger;
+        private readonly ISpecializationRepository _special;
 
-        public AdminController(IAdminApiRepository admin, IAuthenticationRepository auth, ILogger<AdminController> logger)
+        public AdminController(IAdminApiRepository admin, IAuthenticationRepository auth, ILogger<AdminController> logger, ISpecializationRepository special)
         {
             _admin = admin;
             _auth = auth;
             _logger = logger;
+            _special = special;
         }
 
-        [Authorize(Roles = "Admin")]
         public IActionResult Index()
         {
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+       
         public IActionResult GetAllPatient()
         {
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        
         public IActionResult GetAllDoctor()
         {
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        
         public IActionResult GetAllSpecialization()
         {
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        
         [HttpGet]
         public IActionResult AddPatient()
         {
@@ -90,22 +92,58 @@ namespace AppoinmentManagment.Controllers
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        
         public IActionResult AddDoctor()
         {
             return View();
         }
 
-        [Authorize(Roles = "Admin")]
+        [HttpGet]
         public IActionResult AddSpecialization()
         {
             return View();
         }
 
+        [HttpPost]
+        public IActionResult AddSpecialization(SpecializationModel sm)
+        {
+            _logger.LogInformation("The Specialization Post method has been called");
+            try
+            {
+                //Query for user existence
+                bool specializationExists = _special.specAlreadyExists(sm);
+
+                if (specializationExists == true)
+                {
+                    ViewBag.Error = "Specialization Already Exists";
+                    return View();
+                }
+                
+                int result = _special.Add(sm);
+                if (result > 0)
+                {
+                    _logger.LogInformation("specialization data Inserted");
+                    return RedirectToRoute("Admindashboard");
+                }
+                else
+                {
+                    ViewBag.Error = "Error occured Please contact to It person";
+                    return View();
+                }
+            }
+            catch (NullReferenceException e)
+            {
+                _logger.LogError($"Exception - '{e}'");
+                ViewBag.Error = "Specialization Adding Failed, Please Try again!";
+                return View();
+            }
+            
+        }
+
 
 
         #region API
-        [Authorize(Roles = "Admin")]
+
         [Route("/CountPatient")]
         public JsonResult CountPatient()
         {
@@ -113,8 +151,7 @@ namespace AppoinmentManagment.Controllers
             return Json(new { Patient = patient });
         }
 
-
-        [Authorize(Roles = "Admin")]
+        
         [Route("/CountDoctor")]
         public JsonResult CountDoctor()
         {
@@ -122,7 +159,7 @@ namespace AppoinmentManagment.Controllers
             return Json(new { Doctor = doctor });
         }
 
-        [Authorize(Roles = "Admin")]
+        
         [Route("/CountSpecialization")]
         public JsonResult CountSpecialization()
         {
@@ -130,7 +167,7 @@ namespace AppoinmentManagment.Controllers
             return Json(new { Special = special });
         }
 
-        [Authorize(Roles = "Admin")]
+        
         [Route("/Balance")]
         public JsonResult Balance()
         {
@@ -138,7 +175,7 @@ namespace AppoinmentManagment.Controllers
             return Json(new { Balance = balance });
         }
 
-        [Authorize(Roles = "Admin")]
+        
         [Route("/GetAllPatient")]
         public JsonResult GetAllPatientList()
         {

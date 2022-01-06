@@ -3,6 +3,7 @@ using AppoinmentManagment.DataAccessLayer.Repository;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,11 +31,15 @@ namespace AppoinmentManagment
             services.AddTransient<IUserRepository, UserRepository>();
             services.AddTransient<IAdminApiRepository, AdminApiRepository>();
             services.AddTransient<ICompanyRepository, CompanyRepository>();
+            services.AddTransient<ISpecializationRepository, SpecializationRepository>();
+            services.AddTransient<IAppointmentRepository, AppointmentRepository>();
+            services.AddTransient<IDoctorRepository, DoctorRepository>();
             services.AddRazorPages();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
                 .AddCookie(options =>
                 {
+                    options.AccessDeniedPath = new PathString("/accessdenied");
                     options.LoginPath = "/Login";
                     options.Cookie.Name = "Hospital";
 
@@ -68,11 +73,17 @@ namespace AppoinmentManagment
 
             app.UseEndpoints(endpoints =>
             {
+                //Home Controller
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "/",
                     defaults: new { controller = "Home", action = "Index", });
+                endpoints.MapControllerRoute(
+                    name: "accessdenied",
+                    pattern: "/accessdenied",
+                    defaults: new { controller = "Home", action = "AccessDenied", });
 
+                //Authentication Controller
                 endpoints.MapControllerRoute(
                     name: "register",
                     pattern: "/Registration",
@@ -85,10 +96,17 @@ namespace AppoinmentManagment
                     name: "logout",
                     pattern: "/Logout",
                     defaults: new { controller = "Authentication", action = "Logout", });
+
+                //Patient Controller
                 endpoints.MapControllerRoute(
                     name: "Patientdashboard",
                     pattern: "/patient/dashboard",
                     defaults: new { controller = "Patient", action = "Index", });
+                endpoints.MapControllerRoute(
+                    name: "appoinment",
+                    pattern: "/patient/appoinment",
+                    defaults: new { controller = "Patient", action = "Appointment", });
+                //Admin Controller
                 endpoints.MapControllerRoute(
                     name: "Admindashboard",
                     pattern: "/admin/dashboard",
@@ -117,6 +135,18 @@ namespace AppoinmentManagment
                     name: "AddPatient",
                     pattern: "/admin/patient/add",
                     defaults: new { controller = "Admin", action = "AddPatient", });
+
+                //Doctor Controller
+                endpoints.MapControllerRoute(
+                    name: "Doctordashboard",
+                    pattern: "/doctor/dashboard",
+                    defaults: new { controller = "Doctor", action = "Index", });
+
+                //Doctor Controller
+                endpoints.MapControllerRoute(
+                    name: "Secretarydashboard",
+                    pattern: "/secretary/dashboard",
+                    defaults: new { controller = "Secretary", action = "Index", });
             });
         }
     }

@@ -5,10 +5,8 @@ using System.Text;
 
 namespace AppoinmentManagment.DataAccessLayer.IRepository
 {
-    public interface IUserRepository
+    public interface IDoctorRepository
     {
-        UserBO GetUserType(int type);
-
-        string GetUserName(int id);
+        List<DoctorBO> GetDoctorBySpecialization(int id);
     }
 }

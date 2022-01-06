@@ -1,5 +1,6 @@
 ﻿using AppoinmentManagment.DataAccessLayer.IRepository;
 using AppoinmentManagment.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
@@ -24,6 +25,13 @@ namespace AppoinmentManagment.Controllers
         public IActionResult Index()
         {
             _logger.LogInformation("The main page has been accessed");
+            return View();
+        }
+
+        [HttpGet]
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
             return View();
         }
 

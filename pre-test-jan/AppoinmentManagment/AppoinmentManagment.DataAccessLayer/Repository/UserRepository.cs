@@ -20,6 +20,39 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
             _logger = logger;
         }
 
+        public string GetUserName(int id)
+        {
+            string query = $"select [Name] from [User] where OId = '{id}'";
+
+            _logger.LogInformation("Getting user type..");
+            UserBO user = new UserBO();
+
+            string connectionString = _config["ConnectionStrings:DefaultConnection"];
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string sql = query;
+                SqlCommand command = new SqlCommand(sql, connection);
+                using (SqlDataReader dataReader = command.ExecuteReader())
+                {
+                    try
+                    {
+                        while (dataReader.Read()) //make it single user
+                        {
+                            user.Name = dataReader["Name"].ToString();
+                        }
+                    }
+                    catch (NullReferenceException e)
+                    {
+                        _logger.LogWarning($"'{e}' Exception");
+                    }
+                }
+                connection.Close();
+            }
+            return user.Name;
+        }
+
         public UserBO GetUserType(int type)
         {
             string query = $"select [Type] from [UserType] where OId = '{type}'";
