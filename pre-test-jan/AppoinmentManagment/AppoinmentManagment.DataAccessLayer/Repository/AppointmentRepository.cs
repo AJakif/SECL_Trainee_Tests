@@ -14,17 +14,19 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
 
         private readonly ILogger<AppointmentRepository> _logger;
         private readonly IConfiguration _config;
+        private readonly IUserRepository _user;
 
-        public AppointmentRepository(ILogger<AppointmentRepository> logger, IConfiguration config)
+        public AppointmentRepository(ILogger<AppointmentRepository> logger, IConfiguration config, IUserRepository user)
         {
             _logger = logger;
             _config = config;
+            _user = user;
         }
 
         public int Add(AppoinmentBO abo, int id, string name, string appointId)
         {
-            string Query = $"INSERT INTO [dbo].[Appoinment]([AppointId],[PatientId],[DoctorId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[Symptom],[Medication],[Created_at],[Created_by])" +
-                            $"VALUES('{appointId}','{id}','{abo.DoctorId}','{abo.AppointmentDate}','{abo.AppointmentTime}','Pending','{abo.Symptom}','{abo.Medication}', GetDate(),'{name}')";
+            string Query = $"INSERT INTO [dbo].[Appoinment]([AppointId],[PatientId],[DoctorId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[Symptom],[Medication],[IsVisited],[Created_at],[Created_by])" +
+                            $"VALUES('{appointId}','{id}','{abo.DoctorId}','{abo.AppointmentDate}','{abo.AppointmentTime}','Pending','{abo.Symptom}','{abo.Medication}',0, GetDate(),'{name}')";
 
             int Result;
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
@@ -82,7 +84,7 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
         public AppoinmentBO GetAllAppoinmentByDrId(string DrId)
         {
             AppoinmentBO abo = new AppoinmentBO();
-            string Query = $"SELECT [AppointId],[PatientId],[DoctorId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[Symptom],[Medication] FROM [Hospital].[dbo].[Appoinment]  where [DoctorId] = '{DrId}'";
+            string Query = $"SELECT [AppointId],[PatientId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[Symptom],[Medication] FROM [Hospital].[dbo].[Appoinment]  where [DoctorId] = '{DrId}'";
             try
             {
                 string connectionString = _config["ConnectionStrings:DefaultConnection"];
@@ -99,7 +101,11 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
                     {
                         while (dataReader.Read()) //make it single user
                         {
-
+                            abo.AppointmentId = dataReader["AppointId"].ToString();
+                            abo.PatientName = _user.GetUserName(Convert.ToInt32(dataReader["UserId"]));
+                            abo.Medication = dataReader["Medication"].ToString();
+                            abo.Symptom = dataReader["Symptom"].ToString();
+                            abo.AppointmentStatus = dataReader["AppointmentStatus"].ToString();
                         }
                     }
                     catch (NullReferenceException e)
@@ -113,12 +119,13 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
                 }
 
                 connection.Close();
+                return abo;
             }
             catch(Exception )
             {
-
+                return abo;
             }
-            return abo;
+            
         }
     }
 }
