@@ -44,19 +44,21 @@ namespace AppoinmentManagment.Controllers
         {
             (int id, _) = HttpContext.GetUserInfo();
             (_, string name) = HttpContext.GetUserInfo();
-            _logger.LogInformation("The Specialization Post method has been called");
+            _logger.LogInformation("The Appoinment Post method has been called");
             try
             {
                 //Query for user existence
-                bool applicationExists = _appointment.appointmentAlreadyExists(abo, id);
+                var date = DateTime.Now;
+                string appointId = "app"+date.ToString("yyyyMMdd-HHmmssfff");
+                bool applicationExists = _appointment.AppointmentAlreadyExists( abo, id);
 
                 if (applicationExists == true)
                 {
-                    ViewBag.Error = "Appointment Already Exists";
+                    ViewBag.Error = "Appointment for this doctor on the date already exists";
                     return View();
                 }
 
-                int result = _appointment.Add(abo,id,name);
+                int result = _appointment.Add(abo,id,name, appointId);
                 if (result > 0)
                 {
                     _logger.LogInformation("Appointment data Inserted");

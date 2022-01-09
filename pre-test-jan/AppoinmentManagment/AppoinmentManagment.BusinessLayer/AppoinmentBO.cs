@@ -11,12 +11,12 @@ namespace AppoinmentManagment.BusinessLayer
         public string DoctorId { get; set; }
 
         [Required]
-        public DateTime AppointmentDate { get; set; }
+        public string AppointmentDate { get; set; }
 
         [Required]
-        public DateTime AppointmentTime { get; set; }
+        public string AppointmentTime { get; set; }
 
-        
+        [Required]
         public string AppointmentStatus { get; set; }
 
         [Required]

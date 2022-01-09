@@ -18,12 +18,14 @@ namespace AppoinmentManagment.Controllers
         private readonly ILogger<AuthenticationController> _logger;
         private readonly IAuthenticationRepository _auth;
         private readonly IUserRepository _user;
+        private readonly ISecretaryRepository _secretary;
 
-        public AuthenticationController(ILogger<AuthenticationController> logger, IAuthenticationRepository auth, IUserRepository user)
+        public AuthenticationController(ILogger<AuthenticationController> logger, IAuthenticationRepository auth, IUserRepository user, ISecretaryRepository secretary)
         {
             _logger = logger;
             _auth = auth;
             _user = user;
+            _secretary = secretary;
         }
 
         [HttpGet]
@@ -83,7 +85,37 @@ namespace AppoinmentManagment.Controllers
 
                 if (userDetails != null && userDetails.Email != null) //all data should be null checked
                 {
-                    var claims = new List<Claim>
+                    if (user.Type == "Secretary")
+                    {
+                        string id = _secretary.GetDrId(userDetails.OId);
+                        var claims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Email,userDetails.Email),
+                            new Claim("Name", userDetails.Name),
+                            new Claim(ClaimTypes.NameIdentifier, userDetails.OId.ToString()),
+                            new Claim(ClaimTypes.Role,user.Type),
+                            new Claim("DoctorId", id)
+
+                        };
+                        _logger.LogInformation("secretary Email, Name and Id , doctor id set on claim");
+                        var identity = new ClaimsIdentity(
+                            claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var authProperties = new AuthenticationProperties
+                        {
+                            AllowRefresh = true,
+                            // Refreshing the authentication session should be allowed.
+
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                            // The time at which the authentication ticket expires. A 
+                            // value set here overrides the ExpireTimeSpan option of 
+                            // CookieAuthenticationOptions set with AddCookie.
+                        };
+
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProperties);
+                    }
+                    else
+                    {
+                        var claims = new List<Claim>
                         {
                             new Claim(ClaimTypes.Email,userDetails.Email),
                             new Claim("Name", userDetails.Name),
@@ -91,21 +123,24 @@ namespace AppoinmentManagment.Controllers
                             new Claim(ClaimTypes.Role,user.Type)
 
                         };
-                    _logger.LogInformation("User Email, Name and Id set on claim");
-                    var identity = new ClaimsIdentity(
-                        claims, CookieAuthenticationDefaults.AuthenticationScheme);
-                    var authProperties = new AuthenticationProperties
-                    {
-                        AllowRefresh = true,
-                        // Refreshing the authentication session should be allowed.
+                        _logger.LogInformation("User Email, Name and Id set on claim");
+                        var identity = new ClaimsIdentity(
+                            claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        var authProperties = new AuthenticationProperties
+                        {
+                            AllowRefresh = true,
+                            // Refreshing the authentication session should be allowed.
 
-                        ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
-                        // The time at which the authentication ticket expires. A 
-                        // value set here overrides the ExpireTimeSpan option of 
-                        // CookieAuthenticationOptions set with AddCookie.
-                    };
+                            ExpiresUtc = DateTimeOffset.UtcNow.AddMinutes(30)
+                            // The time at which the authentication ticket expires. A 
+                            // value set here overrides the ExpireTimeSpan option of 
+                            // CookieAuthenticationOptions set with AddCookie.
+                        };
 
-                    await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProperties);
+                        await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity), authProperties);
+                    }
+                   
+                    
                     if(user.Type == "Patient")
                     {
                         return RedirectToRoute("Patientdashboard");

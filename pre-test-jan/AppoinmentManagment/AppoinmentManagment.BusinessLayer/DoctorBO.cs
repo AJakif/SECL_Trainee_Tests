@@ -6,7 +6,7 @@ namespace AppoinmentManagment.BusinessLayer
 {
     public class DoctorBO
     {
-            public int DrId { get; set; }
+            public string DrId { get; set; }
 
             public int UserId { get; set; }
 

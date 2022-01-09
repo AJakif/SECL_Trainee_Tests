@@ -34,6 +34,7 @@ namespace AppoinmentManagment
             services.AddTransient<ISpecializationRepository, SpecializationRepository>();
             services.AddTransient<IAppointmentRepository, AppointmentRepository>();
             services.AddTransient<IDoctorRepository, DoctorRepository>();
+            services.AddTransient<ISecretaryRepository, SecretaryRepository>();
             services.AddRazorPages();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

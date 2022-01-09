@@ -42,13 +42,13 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
                     {
                         while (dataReader.Read()) 
                         {
-                            //DoctorBO dbo = new DoctorBO()
-                            //{
-                            //    DrId = Convert.ToInt32(dataReader["DrId"]),
-                            //    UserId = Convert.ToInt32(dataReader["OId"]),
-                            //    Name = _user.GetUserName(Convert.ToInt32(dataReader["OId"])).ToString(),
-                            //    SpecializationId = Convert.ToInt32(dataReader["SpecializationId"])
-                            //};
+                            DoctorBO dbo = new DoctorBO()
+                            {
+                                DrId = dataReader["DrId"].ToString(),
+                                UserId = Convert.ToInt32(dataReader["UserId"]),
+                                Name = _user.GetUserName(Convert.ToInt32(dataReader["UserId"])).ToString(),
+                                SpecializationId = Convert.ToInt32(dataReader["SpecializationId"])
+                            };
                             dbol.Add(dbo);
                         }
                     }

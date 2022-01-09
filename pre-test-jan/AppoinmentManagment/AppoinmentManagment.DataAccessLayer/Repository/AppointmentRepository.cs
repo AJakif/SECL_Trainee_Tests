@@ -21,10 +21,10 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
             _config = config;
         }
 
-        public int Add(AppoinmentBO abo, int id, string name)
+        public int Add(AppoinmentBO abo, int id, string name, string appointId)
         {
-            string Query = $"INSERT INTO [dbo].[Appoinment]([PatientId],[DoctorId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[Symptom],[Medication],[Created_at],[Created_by])" +
-                            $"VALUES('{id}','{abo.DoctorId}','{abo.AppointmentDate}','{abo.AppointmentTime}','{abo.AppointmentStatus}','{abo.Symptom}','{abo.Medication}', GetDate(),'{name}')";
+            string Query = $"INSERT INTO [dbo].[Appoinment]([AppointId],[PatientId],[DoctorId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[Symptom],[Medication],[Created_at],[Created_by])" +
+                            $"VALUES('{appointId}','{id}','{abo.DoctorId}','{abo.AppointmentDate}','{abo.AppointmentTime}','Pending','{abo.Symptom}','{abo.Medication}', GetDate(),'{name}')";
 
             int Result;
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
@@ -47,20 +47,21 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
             }
         }
 
-        public bool appointmentAlreadyExists(AppoinmentBO abo,int id)
+        public bool AppointmentAlreadyExists(AppoinmentBO abo, int id)
         {
-            string query = $"SELECT  [OId] FROM [Hospital].[dbo].[Appoinment] WHERE [PatientId] = '{id}' ,[DoctorId] = '{abo.DoctorId}' ,[AppointmentDate] = '{abo.AppointmentDate}' ";
+            string query = $"SELECT  [AppointId] FROM [Hospital].[dbo].[Appoinment] WHERE [PatientId] = '{id}' AND [DoctorId] = '{abo.DoctorId}'AND [AppointmentDate] = '{abo.AppointmentDate}'AND [AppointmentStatus] = 'Pending' OR [AppointmentStatus] = 'Active'";
             _logger.LogInformation("Entered in AppointmentAlreadyExists..");
             bool flag = false;
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                connection.Open();
-                string sql = query;
-                SqlCommand command = new SqlCommand(sql, connection);
-                SqlDataReader dr = command.ExecuteReader();
+                
                 try
                 {
+                    connection.Open();
+                    string sql = query;
+                    SqlCommand command = new SqlCommand(sql, connection);
+                    SqlDataReader dr = command.ExecuteReader();
                     if (dr.HasRows)
                     {
                         flag = true;
@@ -76,6 +77,48 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
 
             }
             return flag;
+        }
+
+        public AppoinmentBO GetAllAppoinmentByDrId(string DrId)
+        {
+            AppoinmentBO abo = new AppoinmentBO();
+            string Query = $"SELECT [AppointId],[PatientId],[DoctorId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[Symptom],[Medication] FROM [Hospital].[dbo].[Appoinment]  where [DoctorId] = '{DrId}'";
+            try
+            {
+                string connectionString = _config["ConnectionStrings:DefaultConnection"];
+                using SqlConnection connection = new SqlConnection(connectionString);
+
+                try
+                {
+                    connection.Open();
+                    string sql = Query;
+                    SqlCommand command = new SqlCommand(sql, connection);
+                    SqlDataReader dr = command.ExecuteReader();
+                    using SqlDataReader dataReader = command.ExecuteReader();
+                    try
+                    {
+                        while (dataReader.Read()) //make it single user
+                        {
+
+                        }
+                    }
+                    catch (NullReferenceException e)
+                    {
+                        _logger.LogWarning($"'{e}' Exception");
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger.LogWarning($"'{e}' Exception");
+                }
+
+                connection.Close();
+            }
+            catch(Exception )
+            {
+
+            }
+            return abo;
         }
     }
 }

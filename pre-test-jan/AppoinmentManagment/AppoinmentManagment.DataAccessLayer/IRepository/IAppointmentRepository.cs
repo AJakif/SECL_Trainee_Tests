@@ -7,7 +7,10 @@ namespace AppoinmentManagment.DataAccessLayer.IRepository
 {
     public interface IAppointmentRepository
     {
-        bool appointmentAlreadyExists(AppoinmentBO abo, int id);
-        int Add(AppoinmentBO abo, int id, string name);
+        bool AppointmentAlreadyExists(AppoinmentBO abo, int id);
+        int Add(AppoinmentBO abo, int id, string name, string appointId);
+
+        AppoinmentBO GetAllAppoinmentByDrId(string DrId);
+
     }
 }
