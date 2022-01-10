@@ -22,7 +22,7 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
         public string GetDrId(int id)
         {
             try {
-                string query = $"SELECT [DrId] FROM[Hospital].[dbo].[Secretary] Where SecId = '{id}'";
+                string query = $"SELECT [DrId] FROM[Hospital].[dbo].[Secretary] Where UserId = '{id}'";
                 _logger.LogInformation("Login query innitialized and GetUserByEmail class called in common helper class");
                 string drId = "";
                 string connectionString = _config["ConnectionStrings:DefaultConnection"];

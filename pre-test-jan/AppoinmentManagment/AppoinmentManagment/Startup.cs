@@ -143,11 +143,15 @@ namespace AppoinmentManagment
                     pattern: "/doctor/dashboard",
                     defaults: new { controller = "Doctor", action = "Index", });
 
-                //Doctor Controller
+                //Secretary Controller
                 endpoints.MapControllerRoute(
                     name: "Secretarydashboard",
                     pattern: "/secretary/dashboard",
                     defaults: new { controller = "Secretary", action = "Index", });
+                endpoints.MapControllerRoute(
+                    name: "GetAllPendingAppointment",
+                    pattern: "/secretary/dashboard/PendingAppointment",
+                    defaults: new { controller = "Secretary", action = "GetAllPendingAppointment", });
             });
         }
     }

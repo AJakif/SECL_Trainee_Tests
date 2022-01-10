@@ -29,15 +29,70 @@ namespace AppoinmentManagment.Controllers
             return View();
         }
 
-
-        #region API
-
-        [Route("/Appointment/ByDoctorId")]
-        public JsonResult GetAllAppoinment()
+        public IActionResult GetAllPendingAppointment()
         {
             string DrId = HttpContext.GetDrId();
-            AppoinmentBO abo = _appoinment.GetAllAppoinmentByDrId(DrId);
-            return Json(new { data = abo });
+            ListAppoinmentBO model = new ListAppoinmentBO
+            {
+                AppointmentList = _appoinment.GetAllAppoinmentByDrId(DrId)
+            };
+            return View(model);
+        }
+
+
+        #region API
+        [HttpPost]
+        [Route("/appointment/Decline/{id}")]
+        public IActionResult Decline(string id)
+        {
+            try
+            {
+                (_, string name) = HttpContext.GetUserInfo();
+                int result = _appoinment.DeclineAppoinment(id,name);
+                if (result > 0)
+                {
+                    return Json(new { success = true, message = "Appoinment Declined successful" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Error while Declining appoinment." });
+                }
+            }
+            catch (NullReferenceException)
+            {
+                return Json(new { success = false, message = "Error while Decline, please try again!" });
+            }
+        }
+
+        [HttpPost]
+        [Route("/appointment/Approve/{id}")]
+        public IActionResult Approve(string id)
+        {
+            try
+            {
+                (_, string name) = HttpContext.GetUserInfo();
+                int result = _appoinment.ApproveAppoinment(id,name);
+                if (result > 0)
+                {
+                    return Json(new { success = true, message = "Appoinment approves successful" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Error while approving appoinment." });
+                }
+            }
+            catch (NullReferenceException)
+            {
+                return Json(new { success = false, message = "Error while approving, please try again!" });
+            }
+        }
+
+        [Route("/CountPendingAppointment")]
+        public JsonResult CountPendingAppointment()
+        {
+            string DrId = HttpContext.GetDrId();
+            int appointment = _appoinment.CountPendingAppointment(DrId);
+            return Json(new { Appointment = appointment });
         }
         #endregion
     }

@@ -95,7 +95,6 @@ namespace AppoinmentManagment.Controllers
                             new Claim(ClaimTypes.NameIdentifier, userDetails.OId.ToString()),
                             new Claim(ClaimTypes.Role,user.Type),
                             new Claim("DoctorId", id)
-
                         };
                         _logger.LogInformation("secretary Email, Name and Id , doctor id set on claim");
                         var identity = new ClaimsIdentity(

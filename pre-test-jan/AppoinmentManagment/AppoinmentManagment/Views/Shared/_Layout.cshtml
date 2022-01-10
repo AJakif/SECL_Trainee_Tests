@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="~/css/site.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/css/toastr.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.css" />
 </head>
 <body>
@@ -37,18 +37,32 @@
                                     <a class="nav-link" asp-route="Patientdashboard">Dashboard</a>
                                 </li>
                             }
+                            @if (User.IsInRole("Doctor"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-route="Doctordashboard">Dashboard</a>
+                                </li>
+                            }
+                            @if (User.IsInRole("Secretary"))
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link" asp-route="Secretarydashboard">Dashboard</a>
+                                </li>
+                            }
                             <li class="nav-item dropdown">
 
                                 <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropDown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                     Services
                                 </a>
-                                <div class="dropdown-menu" aria-labelledby="navbarDropDown">
-                                    <a class="dropdown-item" asp-controller="" asp-action="">Sample</a>
-                                    @if (User.IsInRole("Admin"))
-                                    {
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <div class="dropdown-menu" aria-labelledby="navbarDropDown">
+                                        <a class="dropdown-item" asp-controller="" asp-action="">Sample</a>
+
                                         <a class="dropdown-item" asp-controller="" asp-action="">Sample 2</a>
-                                    }
-                                </div>
+
+                                    </div>
+                                }
                             </li>
                         </ul>
                     </div>
@@ -76,7 +90,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
     <script src="https://cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery.serializeJSON/2.9.0/jquery.serializejson.min.js"></script>
-    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/2.1.4/toastr.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
 
     @RenderSection("Scripts", required: false)

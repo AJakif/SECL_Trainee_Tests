@@ -61,5 +61,46 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
             }
             return dbol;
         }
+
+        public string GetDoctorName(string id)
+        {
+            var name = "";
+            string Query = $"SELECT [UserId] FROM[Hospital].[dbo].[Doctor]  where [DrId] = '{id}'";
+            string connectionString = _config["ConnectionStrings:DefaultConnection"];
+            using SqlConnection connection = new SqlConnection(connectionString);
+            try
+            {
+                connection.Open();
+                string sql = Query;
+                SqlCommand command = new SqlCommand(sql, connection);
+                try
+                {
+                    using (SqlDataReader dataReader = command.ExecuteReader())
+                    {
+                        while (dataReader.Read()) //make it single user
+                        {
+                            name = _user.GetUserName(Convert.ToInt32(dataReader["UserId"])).ToString();
+                        }
+                        dataReader.Close(); // <- too easy to forget
+                        dataReader.Dispose();
+                        connection.Close();
+                    }
+                    return name;
+                }
+                catch (Exception e)
+                {
+                    _logger.LogWarning($"'{e}' Exception");
+                    connection.Close();
+                    return null;
+                }
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning($"'{e}' Exception");
+                connection.Close();
+                return null;
+            }
+        }
     }
 }

@@ -35,5 +35,6 @@ namespace AppoinmentManagment.BusinessLayer
 
         public string Prescription { get; set; }
 
+        public List<AppoinmentBO> AppoinmentList { get; set; }
     }
 }

@@ -15,12 +15,14 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
         private readonly ILogger<AppointmentRepository> _logger;
         private readonly IConfiguration _config;
         private readonly IUserRepository _user;
+        private readonly IDoctorRepository _doctor;
 
-        public AppointmentRepository(ILogger<AppointmentRepository> logger, IConfiguration config, IUserRepository user)
+        public AppointmentRepository(ILogger<AppointmentRepository> logger, IConfiguration config, IUserRepository user, IDoctorRepository doctor)
         {
             _logger = logger;
             _config = config;
             _user = user;
+            _doctor = doctor;
         }
 
         public int Add(AppoinmentBO abo, int id, string name, string appointId)
@@ -81,31 +83,50 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
             return flag;
         }
 
-        public AppoinmentBO GetAllAppoinmentByDrId(string DrId)
+        public int ApproveAppoinment(string id, string name)
         {
-            AppoinmentBO abo = new AppoinmentBO();
-            string Query = $"SELECT [AppointId],[PatientId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[Symptom],[Medication] FROM [Hospital].[dbo].[Appoinment]  where [DoctorId] = '{DrId}'";
+            string Query = $"UPDATE [dbo].[Appoinment] SET[AppointmentStatus] = 'Approved' ,[Updated_at] = GETDATE() ,[Updated_by] = '{name}' WHERE[AppointId] = '{id}'";
+            int Result;
+            string connectionString = _config["ConnectionStrings:DefaultConnection"];
+            using SqlConnection connection = new SqlConnection(connectionString);
+            connection.Open();
             try
             {
-                string connectionString = _config["ConnectionStrings:DefaultConnection"];
-                using SqlConnection connection = new SqlConnection(connectionString);
+                string sql = Query;
+                SqlCommand command = new SqlCommand(sql, connection);
+                Result = command.ExecuteNonQuery();
+                _logger.LogInformation("Data Updated");
+                connection.Close();
+                return Result;
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning($"'{e}' Exception..");
+                connection.Close();
+                return -1;
+            }
+        }
 
-                try
+        public int CountPendingAppointment(string id)
+        {
+            string query = $"SELECT COUNT([AppointId])as appoint FROM [Hospital].[dbo].[Appoinment] WHERE[AppointmentStatus] = 'Pending' AND [DoctorId] = '{id}'; ";
+            int result = 0;
+            _logger.LogInformation("Getting pending appoinent count..");
+
+            string connectionString = _config["ConnectionStrings:DefaultConnection"];
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string sql = query;
+                SqlCommand command = new SqlCommand(sql, connection);
+                using (SqlDataReader dataReader = command.ExecuteReader())
                 {
-                    connection.Open();
-                    string sql = Query;
-                    SqlCommand command = new SqlCommand(sql, connection);
-                    SqlDataReader dr = command.ExecuteReader();
-                    using SqlDataReader dataReader = command.ExecuteReader();
                     try
                     {
                         while (dataReader.Read()) //make it single user
                         {
-                            abo.AppointmentId = dataReader["AppointId"].ToString();
-                            abo.PatientName = _user.GetUserName(Convert.ToInt32(dataReader["UserId"]));
-                            abo.Medication = dataReader["Medication"].ToString();
-                            abo.Symptom = dataReader["Symptom"].ToString();
-                            abo.AppointmentStatus = dataReader["AppointmentStatus"].ToString();
+                            result = Convert.ToInt32(dataReader["appoint"]);
                         }
                     }
                     catch (NullReferenceException e)
@@ -113,17 +134,87 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
                         _logger.LogWarning($"'{e}' Exception");
                     }
                 }
-                catch (Exception e)
+                connection.Close();
+            }
+            return result;
+        }
+
+        public int DeclineAppoinment(string id, string name)
+        {
+            string Query = $"UPDATE [dbo].[Appoinment] SET[AppointmentStatus] = 'Declined' ,[Updated_at] = GETDATE() ,[Updated_by] = '{name}' WHERE[AppointId] = '{id}'";
+            int Result;
+            string connectionString = _config["ConnectionStrings:DefaultConnection"];
+            using SqlConnection connection = new SqlConnection(connectionString);
+            connection.Open();
+            try
+            {
+                string sql = Query;
+                SqlCommand command = new SqlCommand(sql, connection);
+                Result = command.ExecuteNonQuery();
+                _logger.LogInformation("Data Updated");
+                connection.Close();
+                return Result;
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning($"'{e}' Exception..");
+                connection.Close();
+                return -1;
+            }
+        }
+
+        public List<AppoinmentBO> GetAllAppoinmentByDrId(string DrId)
+        {
+            List<AppoinmentBO> abol = new List<AppoinmentBO>();
+            string Query = $"SELECT [AppointId],[DoctorId],[PatientId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[Symptom],[Medication] FROM [Hospital].[dbo].[Appoinment]  where [DoctorId] = '{DrId}' AND [AppointmentStatus] = 'Pending'";
+            string connectionString = _config["ConnectionStrings:DefaultConnection"];
+            using SqlConnection connection = new SqlConnection(connectionString);
+            
+            try
+            {
+                connection.Open();
+                string sql = Query;
+                    SqlCommand command = new SqlCommand(sql, connection);
+                try
+                {
+                    using (SqlDataReader dataReader = command.ExecuteReader())
+                    {
+                        while (dataReader.Read()) //make it single user
+                        {
+                            AppoinmentBO abo = new AppoinmentBO
+                            {
+                                AppointmentId = dataReader["AppointId"].ToString(),
+                                PatientName = _user.GetUserName(Convert.ToInt32(dataReader["PatientId"])).ToString(),
+                                DoctorName = _doctor.GetDoctorName(dataReader["DoctorId"].ToString()).ToString(),
+                                AppointmentDate = Convert.ToDateTime(dataReader["AppointmentDate"]).ToString("dd/MM/yyyy"),
+                                AppointmentTime = dataReader["AppointmentTime"].ToString(),
+                                Medication = dataReader["Medication"].ToString(),
+                                Symptom = dataReader["Symptom"].ToString(),
+                                AppointmentStatus = dataReader["AppointmentStatus"].ToString()
+                            };
+                            abol.Add(abo);
+                            
+                        }
+                        dataReader.Close(); // <- too easy to forget
+                        dataReader.Dispose();
+                        connection.Close();
+                    }
+                    
+                    return abol;
+                }
+                catch(Exception e)
                 {
                     _logger.LogWarning($"'{e}' Exception");
+                    connection.Close();
+                    return null;
                 }
-
-                connection.Close();
-                return abo;
+                   
             }
-            catch(Exception )
+            catch(Exception e)
             {
-                return abo;
+                _logger.LogWarning($"'{e}' Exception");
+                connection.Close();
+                return null;
             }
             
         }
