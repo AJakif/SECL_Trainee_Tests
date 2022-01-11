@@ -19,17 +19,63 @@ namespace AppoinmentManagment.Controllers
         private readonly IAppointmentRepository _appointment;
         private readonly ISpecializationRepository _special;
         private readonly IDoctorRepository _doctor;
+        private readonly IPaymentRepository _payment;
 
-        public PatientController(ILogger<PatientController> logger, IAppointmentRepository appointment, ISpecializationRepository special, IDoctorRepository doctor)
+        public PatientController(ILogger<PatientController> logger, IAppointmentRepository appointment, ISpecializationRepository special, IDoctorRepository doctor, IPaymentRepository payment)
         {
             _logger = logger;
             _appointment = appointment;
             _special = special;
             _doctor = doctor;
+            _payment = payment;
         }
 
+        [HttpGet]
         public IActionResult Index()
         {
+            (int id, _) = HttpContext.GetUserInfo();
+            ListAppoinmentBO labo = new ListAppoinmentBO()
+            {
+                AppointmentList = _appointment.GetApprovedAppointmentPatientId(id)
+            };
+            return View(labo);
+        }
+
+        [HttpPost]
+        public IActionResult Index(ListAppoinmentBO listabo)
+        {
+            try
+            {
+                var date = DateTime.Now;
+                string transactionId = "trans" + date.ToString("yyyyMMdd-HHmmssfff");
+                (int userId, string name) = HttpContext.GetUserInfo();
+                string DrId = _appointment.GetAppointedDoctorId(listabo.Appointment.AppointmentId);
+                int result = _payment.AddTransaction(listabo, transactionId, userId,DrId,name);
+                if(result>0)
+                {
+                    string appointId = listabo.Appointment.AppointmentId;
+                    int uresult = _appointment.UpdateAppointmentPayment(appointId, name);
+                    if(uresult>0)
+                    {
+                        ListAppoinmentBO labo = new ListAppoinmentBO()
+                        {
+                            AppointmentList = _appointment.GetApprovedAppointmentPatientId(userId)
+                        };
+                        return View(labo);
+                    }
+                }
+                else
+                {
+                    ViewBag.error = "error while transaction, please try again!";
+                    return View();
+                }
+            }
+            catch (Exception e)
+            {
+                ViewBag.error = "error while transaction, please try again!";
+                _logger.LogWarning($"'{e}' exception..");
+                return View();
+            }
             return View();
         }
 
@@ -78,7 +124,18 @@ namespace AppoinmentManagment.Controllers
             }
         }
 
+        
+
         #region API
+
+        [HttpPost]
+        [Route("/payment")]
+        public JsonResult Payment(string id)
+        {
+            decimal fees = _payment.GetDoctorFeesById(id);
+            return Json(new { Fee = fees, Appointment = id });
+
+        }
 
         [Route("/specialization/all")]
         public JsonResult GetAllSpecialization()

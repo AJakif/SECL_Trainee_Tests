@@ -46,7 +46,6 @@ function Approve(url) {
             url: url,
             success: function (data) {
                 if (data.success) {
-
                     toastr["success"](data.message)
                     window.location.reload();
                 }

@@ -61,4 +61,7 @@
         </table>
     </div>
 </div>
-
+@section Scripts {
+    <script src="~/js/SecretaryDashboard.js"></script>
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

@@ -27,8 +27,8 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
 
         public int Add(AppoinmentBO abo, int id, string name, string appointId)
         {
-            string Query = $"INSERT INTO [dbo].[Appoinment]([AppointId],[PatientId],[DoctorId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[Symptom],[Medication],[IsVisited],[Created_at],[Created_by])" +
-                            $"VALUES('{appointId}','{id}','{abo.DoctorId}','{abo.AppointmentDate}','{abo.AppointmentTime}','Pending','{abo.Symptom}','{abo.Medication}',0, GetDate(),'{name}')";
+            string Query = $"INSERT INTO [dbo].[Appoinment]([AppointId],[PatientId],[DoctorId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[Symptom],[Medication],[IsVisited],[IsPaid],[Created_at],[Created_by])" +
+                            $"VALUES('{appointId}','{id}','{abo.DoctorId}','{abo.AppointmentDate}','{abo.AppointmentTime}','Pending','{abo.Symptom}','{abo.Medication}',0,0, GetDate(),'{name}')";
 
             int Result;
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
@@ -217,6 +217,117 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
                 return null;
             }
             
+        }
+
+        public string GetAppointedDoctorId(string id)
+        {
+            
+            string query = $"SELECT[DoctorId]  FROM[Hospital].[dbo].[Appoinment]  Where[AppointId] = '{id}'";
+            string DrId = "";
+
+            string connectionString = _config["ConnectionStrings:DefaultConnection"];
+            using (SqlConnection connection = new SqlConnection(connectionString))
+            {
+                connection.Open();
+
+                string sql = query;
+                SqlCommand command = new SqlCommand(sql, connection);
+                using (SqlDataReader dataReader = command.ExecuteReader())
+                {
+                    try
+                    {
+                        while (dataReader.Read())
+                        {
+                            DrId = dataReader["DoctorId"].ToString();
+                        }
+                    }
+                    catch (NullReferenceException e)
+                    {
+                        _logger.LogWarning($"'{e}' Exception");
+                    }
+                }
+                connection.Close();
+            }
+            return DrId;
+        }
+
+        public List<AppoinmentBO> GetApprovedAppointmentPatientId(int id)
+        {
+            List<AppoinmentBO> abol = new List<AppoinmentBO>();
+            string Query = $"SELECT [AppointId],[DoctorId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[IsVisited],[IsPaid] FROM[Hospital].[dbo].[Appoinment] WHERE[AppointmentStatus] = 'Approved' OR [AppointmentStatus] = 'Pending' AND[PatientId] = '{id}' AND[IsPaid] = 0";
+            string connectionString = _config["ConnectionStrings:DefaultConnection"];
+            using SqlConnection connection = new SqlConnection(connectionString);
+
+            try
+            {
+                connection.Open();
+                string sql = Query;
+                SqlCommand command = new SqlCommand(sql, connection);
+                try
+                {
+                    using (SqlDataReader dataReader = command.ExecuteReader())
+                    {
+                        while (dataReader.Read()) //make it single user
+                        {
+                            AppoinmentBO abo = new AppoinmentBO
+                            {
+                                AppointmentId = dataReader["AppointId"].ToString(),
+                                DoctorName = _doctor.GetDoctorName(dataReader["DoctorId"].ToString()).ToString(),
+                                AppointmentDate = Convert.ToDateTime(dataReader["AppointmentDate"]).ToString("dd/MM/yyyy"),
+                                AppointmentTime = dataReader["AppointmentTime"].ToString(),
+                                AppointmentStatus = dataReader["AppointmentStatus"].ToString(),
+                                IsVisited = Convert.ToInt32(dataReader["IsVisited"]),
+                                IsPaid = Convert.ToInt32(dataReader["IsPaid"])
+                                
+                            };
+                            abol.Add(abo);
+
+                        }
+                        dataReader.Close(); // <- too easy to forget
+                        dataReader.Dispose();
+                        connection.Close();
+                    }
+
+                    return abol;
+                }
+                catch (Exception e)
+                {
+                    _logger.LogWarning($"'{e}' Exception");
+                    connection.Close();
+                    return null;
+                }
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning($"'{e}' Exception");
+                connection.Close();
+                return null;
+            }
+        }
+
+        public int UpdateAppointmentPayment(string id, string name)
+        {
+            string Query = $"UPDATE [dbo].[Appoinment] SET[IsPaid] = 1 ,[Updated_at] = GETDATE() ,[Updated_by] = '{name}' WHERE [AppointId] = '{id}'";
+            int Result;
+            string connectionString = _config["ConnectionStrings:DefaultConnection"];
+            using SqlConnection connection = new SqlConnection(connectionString);
+            connection.Open();
+            try
+            {
+                string sql = Query;
+                SqlCommand command = new SqlCommand(sql, connection);
+                Result = command.ExecuteNonQuery();
+                _logger.LogInformation("Data Updated");
+                connection.Close();
+                return Result;
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning($"'{e}' Exception..");
+                connection.Close();
+                return -1;
+            }
         }
     }
 }

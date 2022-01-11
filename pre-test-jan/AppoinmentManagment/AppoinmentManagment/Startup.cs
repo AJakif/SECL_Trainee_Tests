@@ -35,6 +35,7 @@ namespace AppoinmentManagment
             services.AddTransient<IAppointmentRepository, AppointmentRepository>();
             services.AddTransient<IDoctorRepository, DoctorRepository>();
             services.AddTransient<ISecretaryRepository, SecretaryRepository>();
+            services.AddTransient<IPaymentRepository, PaymentRepository>();
             services.AddRazorPages();
 
             services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -106,7 +107,16 @@ namespace AppoinmentManagment
                 endpoints.MapControllerRoute(
                     name: "appoinment",
                     pattern: "/patient/appoinment",
-                    defaults: new { controller = "Patient", action = "Appointment", });
+                    defaults: new { controller = "Patient", action = "Appointment", }); 
+                endpoints.MapControllerRoute(
+                    name: "payment",
+                    pattern: "/patient/payment",
+                    defaults: new { controller = "Patient", action = "Payment", });
+                endpoints.MapControllerRoute(
+                    name: "paymentSuccessfull",
+                    pattern: "/patient/payment/successfull",
+                    defaults: new { controller = "Patient", action = "PaymentSuccessfull", });
+
                 //Admin Controller
                 endpoints.MapControllerRoute(
                     name: "Admindashboard",

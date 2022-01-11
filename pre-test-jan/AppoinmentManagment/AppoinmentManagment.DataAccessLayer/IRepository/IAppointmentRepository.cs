@@ -17,5 +17,10 @@ namespace AppoinmentManagment.DataAccessLayer.IRepository
 
         int CountPendingAppointment(string id);
 
+        List<AppoinmentBO> GetApprovedAppointmentPatientId(int id);
+
+        string GetAppointedDoctorId(string id);
+
+        int UpdateAppointmentPayment(string id, string name);
     }
 }

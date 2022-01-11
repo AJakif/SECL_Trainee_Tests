@@ -25,7 +25,7 @@ namespace AppoinmentManagment
                 Log.Information("Starting our service..");
                 CreateHostBuilder(args).Build().Run();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 Log.Fatal(ex, "Exception in application..");
             }

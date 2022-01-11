@@ -62,6 +62,7 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
             return dbol;
         }
 
+        
         public string GetDoctorName(string id)
         {
             var name = "";
