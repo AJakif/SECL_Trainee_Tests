@@ -243,7 +243,7 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
                             abo.Diesis = dataReader["Diesis"].ToString();
                             abo.Medication = dataReader["Medication"].ToString();
                             abo.Prescription = dataReader["Prescription"].ToString();
-                            abo.Symptom = dataReader["Sympton"].ToString();
+                            abo.Symptom = dataReader["Symptom"].ToString();
 
                         }
                         dataReader.Close(); // <- too easy to forget

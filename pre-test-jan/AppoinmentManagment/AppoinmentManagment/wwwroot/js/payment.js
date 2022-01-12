@@ -14,3 +14,31 @@
         })
     });
 });
+
+function Details(url) {
+
+    $.ajax({
+        type:'POST',
+        url: url,
+        success: function (response) {
+            console.log(response)
+            var res = response.data;
+            if (res != null) {
+                swal.fire({
+                    title: "Details",
+                    html: `<div class="text-left">
+                            <p><b>Appoinment ID:</b> ${res.appointmentId}</p>
+                            <p><b>Patient Name:</b> ${res.patientName} </p>
+                            <p><b>Symptom:</b> ${res.symptom} </p>
+                            <p><b>Medication:</b> ${res.medication} </p>
+                            <p><b>Desis:</b> ${res.diesis} </p>
+                            <p><b>Prescription :</b> ${res.prescription} </p>
+                           </div>`
+                })
+            }
+            else {
+                toastr["error"](data.message);
+            }
+        }
+    });
+};

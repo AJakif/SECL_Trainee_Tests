@@ -124,9 +124,18 @@ namespace AppoinmentManagment.Controllers
             }
         }
 
-        
+
 
         #region API
+
+        [HttpPost]
+        [Route("/appointment/details/{id}")]
+        public JsonResult Patient(string id)
+        {
+            AppoinmentBO abo = _appointment.GetAppoinmentById(id);
+
+            return Json(new { data = abo });
+        }
 
         [HttpPost]
         [Route("/payment")]

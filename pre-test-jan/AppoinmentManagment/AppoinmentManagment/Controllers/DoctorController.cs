@@ -85,7 +85,7 @@ namespace AppoinmentManagment.Controllers
         {
             AppoinmentBO abo = _appointment.GetAppoinmentById(id);
 
-            return Json(abo);
+            return Json( new { data = abo } );
         }
         #endregion
     }
