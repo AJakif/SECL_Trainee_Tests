@@ -79,15 +79,29 @@
                                 </div>
                             </td>
                         }
-                        if(appoint.IsVisited == 1)
+                        @if (appoint.IsVisited == 1)
                         {
-                            <td class=" text-center">
-                                <div class="text-center">
-                                    <a class="btn btn-success text-white edit" style="cursor:pointer; width:60px;" data-toggle="modal" data-target="#EditRecord" data-id="@appoint.AppointmentId">
-                                        <i data-toggle="tooltip" data-placement="top" title="Pay Doctor Fees" class="fas fa-money-bill-wave"></i>
-                                    </a>
-                                </div>
-                            </td>
+                            @if (appoint.IsPrescribed == 0)
+                            {
+                                <td class=" text-center">
+                                    <div class="text-center">
+                                        <a class="btn btn-success text-white edit" style="cursor:pointer; width:60px;" data-toggle="modal" data-target="#EditRecord" data-id="@appoint.AppointmentId">
+                                            <i data-toggle="tooltip" data-placement="top" title="Pay Doctor Fees" class="fas fa-money-bill-wave"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            }
+                            @if(appoint.IsPrescribed == 1)
+                            {
+                                <td class=" text-center">
+                                    <div class="text-center">
+                                        <a class="btn btn-primary text-white" style="cursor:pointer; width:60px;" >
+                                            <i data-toggle="tooltip" data-placement="top" title="Prescription" class="fas fa-notes-medical"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            }
+
                         }
                     }
                 }

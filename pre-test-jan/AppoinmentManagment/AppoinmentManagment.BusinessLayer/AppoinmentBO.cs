@@ -38,6 +38,8 @@ namespace AppoinmentManagment.BusinessLayer
         public int IsVisited { get; set; }
         public int IsPaid { get; set; }
 
+        public int IsPrescribed { get; set; }
+
         public List<AppoinmentBO> AppoinmentList { get; set; }
     }
 }

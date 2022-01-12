@@ -103,5 +103,42 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
                 return null;
             }
         }
+
+        public string GetDrId(int id)
+        {
+            try
+            {
+                string query = $"SELECT [DrId] FROM[Hospital].[dbo].[Doctor] Where [UserId] = '{id}'";
+                string drId = "";
+                string connectionString = _config["ConnectionStrings:DefaultConnection"];
+                using (SqlConnection connection = new SqlConnection(connectionString))
+                {
+                    connection.Open();
+                    string sql = query;
+                    SqlCommand command = new SqlCommand(sql, connection);
+                    using (SqlDataReader dataReader = command.ExecuteReader())
+                    {
+                        try
+                        {
+                            while (dataReader.Read()) //make it single user
+                            {
+                                drId = dataReader["DrId"].ToString();
+                            }
+                        }
+                        catch (NullReferenceException e)
+                        {
+                            _logger.LogWarning($"'{e}' Exception");
+                        }
+                    }
+                    connection.Close();
+                }
+                return drId;
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning("Error = " + e);
+                return null;
+            }
+        }
     }
 }

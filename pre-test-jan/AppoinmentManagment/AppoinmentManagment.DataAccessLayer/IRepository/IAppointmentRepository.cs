@@ -10,14 +10,20 @@ namespace AppoinmentManagment.DataAccessLayer.IRepository
         bool AppointmentAlreadyExists(AppoinmentBO abo, int id);
         int Add(AppoinmentBO abo, int id, string name, string appointId);
 
+        AppoinmentBO GetAppoinmentById(string id);
+
         List<AppoinmentBO> GetAllAppoinmentByDrId(string DrId);
 
         int DeclineAppoinment(string id, string name);
         int ApproveAppoinment(string id, string name);
+        int VisitAppointment(string id, string name);
+
+        int Prescribe(string id, string prescription, string desis, string name);
 
         int CountPendingAppointment(string id);
 
         List<AppoinmentBO> GetApprovedAppointmentPatientId(int id);
+        List<AppoinmentBO> GetApprovedAppointmentDoctorId(string DrId);
 
         string GetAppointedDoctorId(string id);
 

@@ -10,6 +10,7 @@ namespace AppoinmentManagment.DataAccessLayer.IRepository
         List<DoctorBO> GetDoctorBySpecialization(int id);
         string GetDoctorName(string id);
 
-        
+        string GetDrId(int id);
+
     }
 }
