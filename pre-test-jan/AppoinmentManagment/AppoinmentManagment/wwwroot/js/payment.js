@@ -28,7 +28,7 @@ function Details(url) {
                     title: "Details",
                     html: `<div class="text-left">
                             <p><b>Appoinment ID:</b> ${res.appointmentId}</p>
-                            <p><b>Patient Name:</b> ${res.patientName} </p>
+                            <p><b>Doctor Name:</b> ${res.doctorName} </p>
                             <p><b>Symptom:</b> ${res.symptom} </p>
                             <p><b>Medication:</b> ${res.medication} </p>
                             <p><b>Desis:</b> ${res.diesis} </p>
@@ -37,7 +37,7 @@ function Details(url) {
                 })
             }
             else {
-                toastr["error"](data.message);
+                toastr["error"](response.message);
             }
         }
     });

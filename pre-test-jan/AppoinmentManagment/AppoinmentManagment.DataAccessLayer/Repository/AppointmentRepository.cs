@@ -222,7 +222,7 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
         public AppoinmentBO GetAppoinmentById(string id)
         {
             AppoinmentBO abo = new AppoinmentBO();
-            string Query = $"SELECT [AppointId],[PatientId],[Symptom],[Medication],[Diesis],[Prescription] FROM[Hospital].[dbo].[Appoinment] WHERE [AppointId] = '{id}' ";
+            string Query = $"SELECT [AppointId],[DoctorId],[PatientId],[Symptom],[Medication],[Diesis],[Prescription] FROM[Hospital].[dbo].[Appoinment] WHERE [AppointId] = '{id}' ";
             string connectionString = _config["ConnectionStrings:DefaultConnection"];
             using SqlConnection connection = new SqlConnection(connectionString);
 
@@ -240,6 +240,7 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
 
                             abo.AppointmentId = dataReader["AppointId"].ToString();
                             abo.PatientName = _user.GetUserName(Convert.ToInt32(dataReader["PatientId"])).ToString();
+                            abo.DoctorName = _doctor.GetDoctorName(dataReader["DoctorId"].ToString()).ToString();
                             abo.Diesis = dataReader["Diesis"].ToString();
                             abo.Medication = dataReader["Medication"].ToString();
                             abo.Prescription = dataReader["Prescription"].ToString();

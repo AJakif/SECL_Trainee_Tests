@@ -49,21 +49,6 @@
                                     <a class="nav-link" asp-route="Secretarydashboard">Dashboard</a>
                                 </li>
                             }
-                            <li class="nav-item dropdown">
-
-                                <a class="nav-link dropdown-toggle text-white" href="#" id="navbarDropDown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                    Services
-                                </a>
-                                @if (User.IsInRole("Admin"))
-                                {
-                                    <div class="dropdown-menu" aria-labelledby="navbarDropDown">
-                                        <a class="dropdown-item" asp-controller="" asp-action="">Sample</a>
-
-                                        <a class="dropdown-item" asp-controller="" asp-action="">Sample 2</a>
-
-                                    </div>
-                                }
-                            </li>
                         </ul>
                     </div>
                 }
