@@ -163,7 +163,7 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
             }
         }
 
-        public List<AppoinmentBO> GetAllAppoinmentByDrId(string DrId)
+        public List<AppoinmentBO> GetAllPendingAppoinmentByDrId(string DrId)
         {
             List<AppoinmentBO> abol = new List<AppoinmentBO>();
             string Query = $"SELECT [AppointId],[DoctorId],[PatientId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[Symptom],[Medication] FROM [Hospital].[dbo].[Appoinment]  where [DoctorId] = '{DrId}' AND [AppointmentStatus] = 'Pending'";
@@ -302,7 +302,7 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
             return DrId;
         }
 
-        public List<AppoinmentBO> GetApprovedAppointmentDoctorId(string DrId)
+        public List<AppoinmentBO> GetApprovedPaidAppointmentDoctorId(string DrId)
         {
             List<AppoinmentBO> abol = new List<AppoinmentBO>();
             string Query = $"SELECT [AppointId],[PatientId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[IsVisited],[IsPaid],[IsPrescribed] FROM[Hospital].[dbo].[Appoinment] WHERE[AppointmentStatus] = 'Approved' AND [DoctorId] = '{DrId}' AND [IsPaid] = 1 ";
@@ -483,6 +483,61 @@ namespace AppoinmentManagment.DataAccessLayer.Repository
                 _logger.LogWarning($"'{e}' Exception..");
                 connection.Close();
                 return -1;
+            }
+        }
+
+        public List<AppoinmentBO> GetAllApprovedAppoinmentByDrId(string DrId)
+        {
+            List<AppoinmentBO> abol = new List<AppoinmentBO>();
+            string Query = $"SELECT [AppointId],[DoctorId],[PatientId],[AppointmentDate],[AppointmentTime],[AppointmentStatus],[Symptom],[Medication] FROM [Hospital].[dbo].[Appoinment]  where [DoctorId] = '{DrId}' AND [AppointmentStatus] = 'Approved'";
+            string connectionString = _config["ConnectionStrings:DefaultConnection"];
+            using SqlConnection connection = new SqlConnection(connectionString);
+
+            try
+            {
+                connection.Open();
+                string sql = Query;
+                SqlCommand command = new SqlCommand(sql, connection);
+                try
+                {
+                    using (SqlDataReader dataReader = command.ExecuteReader())
+                    {
+                        while (dataReader.Read()) //make it single user
+                        {
+                            AppoinmentBO abo = new AppoinmentBO
+                            {
+                                AppointmentId = dataReader["AppointId"].ToString(),
+                                PatientName = _user.GetUserName(Convert.ToInt32(dataReader["PatientId"])).ToString(),
+                                DoctorName = _doctor.GetDoctorName(dataReader["DoctorId"].ToString()).ToString(),
+                                AppointmentDate = Convert.ToDateTime(dataReader["AppointmentDate"]).ToString("dd/MM/yyyy"),
+                                AppointmentTime = dataReader["AppointmentTime"].ToString(),
+                                Medication = dataReader["Medication"].ToString(),
+                                Symptom = dataReader["Symptom"].ToString(),
+                                AppointmentStatus = dataReader["AppointmentStatus"].ToString()
+                            };
+                            abol.Add(abo);
+
+                        }
+                        dataReader.Close(); // <- too easy to forget
+                        dataReader.Dispose();
+                        connection.Close();
+                    }
+
+                    return abol;
+                }
+                catch (Exception e)
+                {
+                    _logger.LogWarning($"'{e}' Exception");
+                    connection.Close();
+                    return null;
+                }
+
+            }
+            catch (Exception e)
+            {
+                _logger.LogWarning($"'{e}' Exception");
+                connection.Close();
+                return null;
             }
         }
     }

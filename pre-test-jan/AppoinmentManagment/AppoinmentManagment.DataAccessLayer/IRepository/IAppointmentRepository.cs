@@ -12,7 +12,8 @@ namespace AppoinmentManagment.DataAccessLayer.IRepository
 
         AppoinmentBO GetAppoinmentById(string id);
 
-        List<AppoinmentBO> GetAllAppoinmentByDrId(string DrId);
+        List<AppoinmentBO> GetAllPendingAppoinmentByDrId(string DrId);
+        List<AppoinmentBO> GetAllApprovedAppoinmentByDrId(string DrId);
 
         int DeclineAppoinment(string id, string name);
         int ApproveAppoinment(string id, string name);
@@ -23,7 +24,7 @@ namespace AppoinmentManagment.DataAccessLayer.IRepository
         int CountPendingAppointment(string id);
 
         List<AppoinmentBO> GetApprovedAppointmentPatientId(int id);
-        List<AppoinmentBO> GetApprovedAppointmentDoctorId(string DrId);
+        List<AppoinmentBO> GetApprovedPaidAppointmentDoctorId(string DrId);
 
         string GetAppointedDoctorId(string id);
 

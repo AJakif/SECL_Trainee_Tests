@@ -11,6 +11,9 @@ namespace AppoinmentManagment.DataAccessLayer.IRepository
         int CountDoctor();
         int CountSpecialization();
         int TotalBalance();
+
+        List<MonthlyDepositBO> GetMonthlyDeposit();
+        List<Monthly> GetYearlyDeposit();
         List<UserBO> GetAllPatientList();
     }
 }

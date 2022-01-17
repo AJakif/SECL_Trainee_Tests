@@ -182,6 +182,19 @@ namespace AppoinmentManagment.Controllers
             List<UserBO> user = _admin.GetAllPatientList();
             return Json(new { data = user});
         }
+
+        [Route("/admin/Report/monthlyDeposit/")]
+        public JsonResult GetMonthlyDeposit()
+        {
+            List<MonthlyDepositBO> mdbol = _admin.GetMonthlyDeposit();
+            return Json(mdbol);
+        }
+
+        [Route("/admin/Report/yearlyDeposit")]
+        public JsonResult GetYearlyDeposit()
+        {
+            return Json(_admin.GetYearlyDeposit());
+        }
         #endregion
     }
 }

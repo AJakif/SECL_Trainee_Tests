@@ -26,7 +26,7 @@ namespace AppoinmentManagment.Controllers
             string DrId = HttpContext.GetDrId();
             ListAppoinmentBO labo = new ListAppoinmentBO()
             {
-                AppointmentList = _appointment.GetApprovedAppointmentDoctorId(DrId)
+                AppointmentList = _appointment.GetApprovedPaidAppointmentDoctorId(DrId)
             };
             return View(labo);
         }
@@ -45,7 +45,7 @@ namespace AppoinmentManagment.Controllers
                 string DrId = HttpContext.GetDrId();
                 ListAppoinmentBO abo = new ListAppoinmentBO()
                 {
-                    AppointmentList = _appointment.GetApprovedAppointmentDoctorId(DrId)
+                    AppointmentList = _appointment.GetApprovedPaidAppointmentDoctorId(DrId)
                 };
                 return View(abo);
             }

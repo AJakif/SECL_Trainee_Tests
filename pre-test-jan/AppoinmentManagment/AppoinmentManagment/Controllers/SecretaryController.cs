@@ -26,7 +26,12 @@ namespace AppoinmentManagment.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            string DrId = HttpContext.GetDrId();
+            ListAppoinmentBO model = new ListAppoinmentBO
+            {
+                AppointmentList = _appoinment.GetAllApprovedAppoinmentByDrId(DrId)
+            };
+            return View(model);
         }
 
         public IActionResult GetAllPendingAppointment()
@@ -34,7 +39,7 @@ namespace AppoinmentManagment.Controllers
             string DrId = HttpContext.GetDrId();
             ListAppoinmentBO model = new ListAppoinmentBO
             {
-                AppointmentList = _appoinment.GetAllAppoinmentByDrId(DrId)
+                AppointmentList = _appoinment.GetAllPendingAppoinmentByDrId(DrId)
             };
             return View(model);
         }
